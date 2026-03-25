@@ -192,7 +192,7 @@ No, this is a known limitation of the element proposal.
 
 ### Are iframes supported?
 
-Currently, this is restricted to top level browsing contexts for security purposes. Same origin iframes are unlikely to pose a risk, and may be supported in the future.
+Currently, this is restricted to top level browsing contexts for security purposes. Same origin iframes are unlikely to pose a risk and may be supported in the future.
 
 ### How does it behave in sandboxed contexts?
 
