@@ -73,7 +73,7 @@ The user agent can render the element as a simple 'Launch'-style button, a highl
 
 <img alt='A button whose text reads "Launch YouTube Music, from music.youtube.com", with an icon signifying the action of launching.' src='./launch-simple.png' width=200>
 
-User agents must avoid exposing whether apps are installed to side-channel attacks. For example, developers must not be able to detect apps are installed by measuring the size of the rendered install element. Exposing this information increases fingerprinting risk.
+User agents must avoid exposing installed status to side-channel attacks. For example, developers must not be able to detect whether apps are installed by measuring the size of the rendered install element. Exposing this information increases fingerprinting risk.
 
 ## Error handling / debuggability
 
@@ -192,7 +192,7 @@ No, this is a known limitation of the element proposal.
 
 ### Are iframes supported?
 
-Currently, this is restricted to top level browsing contexts for security purposes. Same origin iframes are unlikely to pose a risk, and may be supported in the future.
+Currently, this is restricted to top level browsing contexts for security purposes. Same origin iframes are unlikely to pose a risk and may be supported in the future.
 
 ### How does it behave in sandboxed contexts?
 
