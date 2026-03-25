@@ -67,13 +67,13 @@ If the user agent doesn't support installation, a simple link could be presented
 
 ### What if the app is already installed?
 
-> Note - This behavior is on hold, pending security and privacy considerations.
+> Note - The "Launch" state update is on hold, pending security and privacy considerations. See [#17](https://github.com/WICG/install-element/issues/17) for high level information.
 
 The user agent can render the element as a simple 'Launch'-style button, a highly requested feature from web developers. When clicked, it should follow established launch algorithms such as [launch handler](https://developer.mozilla.org/en-US/docs/Web/API/Launch_Handler_API).
 
 <img alt='A button whose text reads "Launch YouTube Music, from music.youtube.com", with an icon signifying the action of launching.' src='./launch-simple.png' width=200>
 
-User agents must must avoid exposing whether apps are installed to side-channel attacks. For example, developers must not be able to detect apps are installed by measuring the size of the rendered install element. Exposing this information increases fingerprinting risk.
+User agents must avoid exposing whether apps are installed to side-channel attacks. For example, developers must not be able to detect apps are installed by measuring the size of the rendered install element. Exposing this information increases fingerprinting risk.
 
 ## Error handling / debuggability
 
