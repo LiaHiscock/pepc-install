@@ -13,6 +13,8 @@ A declarative `<install>` element that renders a button whose content and presen
 
 ## The Design
 
+> Note - this proposal assumes familiarity with the [permission element](https://wicg.github.io/PEPC/permission-elements.html) spec, which outlines in detail the element's behavior, including styling and activation restrictions, error handling, etc.
+
 ### Element content
 
 The element renders standardized text and iconography controlled by the user agent, such as:
@@ -37,7 +39,7 @@ The element renders standardized text and iconography controlled by the user age
 <!-- Install the current page. -->
 <install></install>
 
-<!-- The manifest file at installurl should contain an id. -->
+<!-- The manifest file at installurl must declare an id. -->
 <install installurl="https://reddit.com/">
 </install>
 ```
@@ -65,14 +67,13 @@ If the user agent doesn't support installation, a simple link could be presented
 
 ### What if the app is already installed?
 
+> Note - This behavior is on hold, pending security and privacy considerations.
+
 The user agent can render the element as a simple 'Launch'-style button, a highly requested feature from web developers. When clicked, it should follow established launch algorithms such as [launch handler](https://developer.mozilla.org/en-US/docs/Web/API/Launch_Handler_API).
 
 <img alt='A button whose text reads "Launch YouTube Music, from music.youtube.com", with an icon signifying the action of launching.' src='./launch-simple.png' width=200>
 
-User agents must must avoid exposing whether apps are installed to side-channel attacks. For eg. developers must not be able to detect apps are installed by measuring the size of the rendered install element. Exposing this information increases fingerprinting risk.
-
-### How should the element behave/render in a standalone window?
-
+User agents must must avoid exposing whether apps are installed to side-channel attacks. For example, developers must not be able to detect apps are installed by measuring the size of the rendered install element. Exposing this information increases fingerprinting risk.
 
 ## Error handling / debuggability
 
@@ -140,7 +141,7 @@ Then we'll trigger an installation prompt in an implementation defined way. This
 the user making some decision, leading to either a `promptdismiss` or `promptaction` event firing
 on the element.
 
-The element hooks directly into the backend of navigator.install. When clicked, it will 
+The element hooks directly into the backend of `navigator.install`. When clicked, it will 
 load the `installurl` in the background to obtain the web application manifest and related 
 resources needed for the installation dialog. The steps here will be similar to those defined 
 for [the "manifest" link type][manifest-fetch], fetching and processing the manifest according 
@@ -187,13 +188,19 @@ Open Questions
 
 No, this is a known limitation of the element proposal.
 
-### Are iFrames supported?
+>The [HTML in Canvas](https://github.com/WICG/html-in-canvas) proposal makes this possible, however additional consideration is needed to avoid privacy/security leaks. See [How will this work with HTML in Canvas](https://github.com/WICG/install-element/issues/9)
 
-No, for security reasons this should be restricted to top level browsing contexts.
+### Are iframes supported?
+
+Currently, this is restricted to top level browsing contexts for security purposes. Same origin iframes are unlikely to pose a risk, and may be supported in the future.
+
+### How does it behave in sandboxed contexts?
+
+Currently, this is disabled in all sandboxed contexts. If a use case for installing from a sandbox presents itself in the future, a strict allow-list can be implemented.
 
 Alternatives
 ------------
-* [Web Install API][api]
+* [Web Install API][api] (navigator.install)
 * Given that the behavior discussed above would support both installation and launching, depending
   on the application's installed state, some more generic name might be appropriate. `<pwa>` or
   `<webapp>` could more broadly describe a potential range of behavior. `<install>` seems preferrable, as launching seems like it's really just a privacy-preserving mechanism to align behavior without
