@@ -1,31 +1,132 @@
-User-Initiated Installation of a Web Application
-===============================
+# User-Initiated Installation of a Web Application
 
-A Problem
----------
+## Authors
 
-Today, the process of distributing and acquiring web applications is both fragmented and limited in capability. Each user agent has created a set of entry points, some more discoverable and intuitive than others. Furthermore, because installation is limited to the current page only, developers and users must jump through even more hoops to create a functional acquisition pipeline for other sites.
+- [Lia Hiscock](https://github.com/LiaHiscock) ([Microsoft](https://microsoft.com/))
+- [Mike West](https://github.com/mikewest) ([Google](https://google.com/))
 
-The Proposal
-----------
+## Participate
 
-A declarative `<install>` element that renders a button whose content and presentation is controlled by the user agent. Similar to other [permission elements][pepc] (e.g. [`<geolocation>`][geolocation]), the user agent's control over (and therefore _understanding of_) the element's content means that it can make plausible assumptions about a user's contextual intent. Users who click on a button labeled "Install 'Wonderful Application'" are unlikely to be surprised if an installation prompt for exactly that application appears, and they'll be primed to make a good decision about the question such a prompt presents.
+- [Issue tracker](https://github.com/WICG/install-element/issues)
+- [Chromestatus](https://chromestatus.com/feature/5152834368700416)
 
-## The Design
+## Status of this Document
 
-> Note - this proposal assumes familiarity with the [permission element](https://wicg.github.io/PEPC/permission-elements.html) spec, which outlines in detail the element's behavior, including styling and activation restrictions, error handling, etc.
+This document is a starting point for engaging the community and standards bodies in developing
+collaborative solutions fit for standardization.
+
+- This document status: **Active**
+- Expected venue: [W3C Web Incubator Community Group](https://github.com/WICG)
+- Current version: this document
+- Origin Trial: The `<install>` element is available as an [Origin Trial](https://developer.chrome.com/docs/web-platform/origin-trials/) in Chrome and Microsoft Edge.
+
+## Table of Contents
+
+<!-- TODO: generate with doctoc -->
+
+## Introduction
+
+The `<install>` element is a declarative HTML element that allows web developers to offer
+installation of web applications directly from a page. It renders a user-agent-controlled button
+whose text and iconography are determined by the browser, providing a strong signal of user intent
+and protection against spoofing. The element is part of the
+[Permission Element](https://wicg.github.io/PEPC/permission-elements.html) family, sharing the
+same security model, styling restrictions, and validation infrastructure.
+
+## User-Facing Problem
+
+End users don't have a standard, cross-platform way to acquire web applications. The process of
+distributing and installing web apps is both fragmented and limited:
+
+- Each browser has different, often hidden, entry points for installation (address bar icons,
+  menu items, prompts).
+- Users may not know that a web app exists for the site they're visiting, or that "installation"
+  is even possible on the web.
+- Developers have no standard declarative mechanism to present an install action to users.
+- Cross-origin installation (e.g. an app catalog installing apps from other sites) has no
+  built-in web platform support.
+
+### Goals
+
+- Provide a **declarative** way to install web applications, requiring no JavaScript for
+  basic usage.
+- Give the **user agent control** over the button's content and presentation, providing a
+  trustworthy signal of user intent.
+- Support both **same-origin** and **cross-origin** installation scenarios.
+- Offer **progressive enhancement** through fallback content for browsers that don't support
+  the element.
+- Integrate with the existing [Permission Element][pepc-spec] infrastructure for consistent
+  security, styling, and validation behavior.
+
+### Non-goals
+
+- Replace [navigator.install()][api]. The imperative and declarative APIs serve complementary
+  use cases and share a backend implementation.
+- Define what "installation" means. This varies by platform and browser.
+- Install arbitrary web content that is not an app (the target must have a manifest file).
+
+## Use Cases
+
+### Same-origin install button
+
+A web app can present an install button on its own page. This is the simplest case — no
+attributes are needed:
+
+```html
+<install>
+  <a href="/about">Learn more about our app</a>
+</install>
+```
+
+### Cross-origin app catalog
+
+A web-based app store or catalog can install apps from other origins:
+
+```html
+<install installurl="https://music.youtube.com/"
+         manifestid="https://music.youtube.com/?source=pwa">
+  <a href="https://music.youtube.com/" target="_blank">
+    Launch YouTube Music
+  </a>
+</install>
+```
+
+### Suite of web apps
+
+A productivity suite can install related apps from the same origin:
+
+```html
+<install installurl="https://suite.example/docs">Install Docs</install>
+<install installurl="https://suite.example/sheets">Install Sheets</install>
+<install installurl="https://suite.example/slides">Install Slides</install>
+```
+
+## Proposed Approach
+
+> **Note** — this proposal assumes familiarity with the
+> [permission element spec][pepc-spec], which outlines in detail the element's
+> behavior, including styling and activation restrictions, error handling, etc.
+
+A declarative `<install>` element that renders a button whose content and presentation is
+controlled by the user agent. Similar to other [permission elements][pepc] (e.g.
+[`<geolocation>`][geolocation]), the user agent's control over the element's content means that
+it can make plausible assumptions about a user's contextual intent. Users who click on a button
+labeled "Install" are unlikely to be surprised if an installation flow begins.
 
 ### Element content
 
-The element renders standardized text and iconography controlled by the user agent, such as:
+The element renders standardized text and iconography controlled by the user agent:
 
-<img alt='A button whose text reads "Install", with an icon signifying the action of installation.' src='./install-icon.png' width=200><br>
+<img alt='A button whose text reads "Install", with an icon signifying the action of installation.' src='./install-icon.png'>
 
 ### Element attributes
 
-`installurl` specifies the document to install. If unspecified, the current site will be installed.
+`installurl` specifies the document to install. If unspecified, the current site will be
+installed.
 
-`manifestid` specifies the computed id of the document to install. If unspecified, the manifest referenced by the document at `installurl` must have a custom id defined. If specified, it must match the computed id of the site to be installed.
+`manifestid` specifies the computed id of the document to install. If unspecified, the manifest
+referenced by the document at `installurl` must have a custom `id` defined. If specified, it must
+match the computed `id` of the site to be installed.
 
 ```html
 <install installurl="https://music.youtube.com/"
@@ -35,6 +136,7 @@ The element renders standardized text and iconography controlled by the user age
 ```
 
 #### Other valid element usages
+
 ```html
 <!-- Install the current page. -->
 <install></install>
@@ -44,62 +146,89 @@ The element renders standardized text and iconography controlled by the user age
 </install>
 ```
 
-### Element behavior
-
-On click, the user agent can initiate their existing installation flow, such as showing a confirmation prompt:
-
-![An installation prompt for `YouTube Music`.](./dialog-ytmusic.png)
-
 ### Element fallback content
 
-If the user agent doesn't support installation, a simple link could be presented:
+If the user agent doesn't support installation, fallback content is rendered:
 
 <img alt='A hyperlink reading "Launch YouTube Music".' src='./install-not-supported.png'>
 
 ```html
-  <install installurl="https://music.youtube.com/"
-           manifestid="https://music.youtube.com/?source=pwa">
-    <a href="https://music.youtube.com/" target="_blank">
-      Launch YouTube Music
-    </a>
-  </install>
+<install installurl="https://music.youtube.com/"
+         manifestid="https://music.youtube.com/?source=pwa">
+  <a href="https://music.youtube.com/" target="_blank">
+    Launch YouTube Music
+  </a>
+</install>
 ```
+
+### Element behavior
+
+On click, the user agent initiates the installation flow. The backend steps are shared with
+[navigator.install()][api] via the same implementation
+(see the [background document installation steps][bg-steps] and
+[current document installation steps][cd-steps] for the full flow).
+
+The key difference is how results are surfaced. Where `navigator.install()` uses promise
+rejections with `DOMException` names, the `<install>` element uses the
+[InPagePermissionMixin][mixin] event model:
+
+| Outcome | `navigator.install()` | `<install>` element |
+|---|---|---|
+| Invalid URL / no manifest / id mismatch | `DataError` rejection | `invalidReason` updated, `onvalidationstatuschange` fired |
+| Invalid installurl attribute | `DataError` rejection | Element disabled, `invalidReason` set |
+| User cancels / dismisses prompt | `AbortError` rejection | `onpromptdismiss` fired |
+| Installation succeeds | Promise resolves with `{ id }` | `onpromptaction` fired |
+| No user activation | `NotAllowedError` rejection | Click ignored (element not valid) |
+| Called outside main frame | `InvalidStateError` rejection | Element not supported in iframes/sandboxes |
+
+The element can also present a confirmation dialog showing the app name and origin
+before installation proceeds:
+
+![An installation prompt for YouTube Music.](./dialog-ytmusic.png)
+
+### Dependencies on non-stable features
+
+- [Permission Elements (PEPC)][pepc-spec] — `<install>` extends the shared
+  `HTMLCapabilityElementBase` alongside `<permission>` and `<geolocation>`, inheriting
+  the blocker system, intersection observer visibility checks, styling restrictions,
+  and `InPagePermissionMixin` interface.
 
 ### What if the app is already installed?
 
-> Note - The "Launch" state update is on hold, pending security and privacy considerations. See [#17](https://github.com/WICG/install-element/issues/17) for high level information.
+> **Note** — The "Launch" state is not currently implemented. During security review,
+> a width side-channel was discovered between the "Install" and "Launch" renderings.
+> The `IsInstalled` backend code has been removed entirely pending a privacy-safe
+> design. See [#17](https://github.com/WICG/install-element/issues/17) for details.
 
-The user agent can render the element as a simple 'Launch'-style button, a highly requested feature from web developers. When clicked, it should follow established launch algorithms such as [launch handler](https://developer.mozilla.org/en-US/docs/Web/API/Launch_Handler_API).
-
-<img alt='A button whose text reads "Launch YouTube Music, from music.youtube.com", with an icon signifying the action of launching.' src='./launch-simple.png' width=200>
-
-User agents must avoid exposing installed status to side-channel attacks. For example, developers must not be able to detect whether apps are installed by measuring the size of the rendered install element. Exposing this information increases fingerprinting risk.
+In the future, the user agent could render the element as a "Launch" button when the app
+is already installed, following established [launch handler](https://developer.mozilla.org/en-US/docs/Web/API/Launch_Handler_API)
+algorithms. User agents must avoid exposing installed status to side-channel attacks.
 
 ## Error handling / debuggability
 
-The element offers event-driven hooks allowing developers to understand users' interactions, reusing [`InPagePermissionMixin`][mixin] concepts like `promptaction`, `promptdismiss`, and `validationstatuschange` events, `isValid` and `invalidReason` attributes, etc. Additional events will be needed for failures related to manifest fetching/parsing.
+The element surfaces errors through the [InPagePermissionMixin][mixin] interface:
 
-Validation errors could include violations of the generally applicable [presentation restrictions][security] for permission elements, as well as data validation errors when processing the referenced manifest.
+- `isValid` returns whether the element can currently be activated. Returns `false` when the
+  element is blocked for any reason (visibility, styling, data errors, etc).
+- `invalidReason` returns a string specifying why the element is currently invalid. This includes
+  the standard [presentation restrictions][pepc-security] for permission elements, as well as
+  install-specific data validation errors (e.g. invalid `installurl`, failed manifest fetch,
+  `manifestid` mismatch).
+- `onvalidationstatuschange` fires when the validation status changes.
+- `onpromptaction` fires when installation completes successfully.
+- `onpromptdismiss` fires when the user cancels or dismisses the installation prompt.
 
-That said, developers wouldn't actually need to hook into any of those attributes for the simplest
-cases: `<install></install>` and `<install installurl="..."></install>` would be sufficient for straightforward use cases of offering installation.
+Developers don't need to use any of these for simple cases — `<install></install>` and
+`<install installurl="..."></install>` work without any event handling.
 
-[pepc]: https://github.com/WICG/PEPC/
-[geolocation]: https://github.com/WICG/PEPC/blob/main/geolocation_explainer.md
-[mixin]: https://wicg.github.io/PEPC/permission-elements.html#permission-mixin
-[security]: https://github.com/WICG/PEPC/blob/main/explainer.md#security-abuse
+### Upcoming: `InstallResultEvent`
 
-### Potential Additional Attributes
+An `oninstallresult` event with a dedicated `InstallResultEvent` interface is under development
+to provide richer result information to developers. This is not yet available.
 
-- `manifesturl`: Link to the manifest file
-- `includeicon`: If specified, fetches and renders the app's icon (in addition to the install icon)
+## IDL
 
-Please give me some IDL and technical detail!
---------------------------------------------------
-
-Ok. Here you go:
-
-```
+```webidl
 [Exposed=Window]
 interface HTMLInstallElement : HTMLElement {
   [HTMLConstructor] constructor();
@@ -107,141 +236,185 @@ interface HTMLInstallElement : HTMLElement {
   [CEReactions, ReflectURL] attribute USVString installurl;
   [CEReactions] attribute USVString manifestid;
 };
-HTMLInstallElement implements InPagePermissionMixin;
+HTMLInstallElement includes InPagePermissionMixin;
 ```
 
-The [`InPagePermissionMixin`][mixin] is defined as part of the general Permission
-Element proposal, and includes a few attributes and events. We'll reuse those here
-for consistency.
+The [`InPagePermissionMixin`][mixin] is defined as part of the
+[Permission Element spec][pepc-spec], and includes the following attributes and events:
 
-* `isValid` will return a boolean: `true` if the element's presentation makes it a valid click
-  target for users (because the user agent has confidence that it's visible and comprehensible,
-  and that it's been in that state long enough to be reasonably reliably viewed and comprehended),
-  `false` otherwise.
+- `isValid` — `true` if the element is a valid click target (visible, comprehensible, and
+  stable long enough to be understood by the user), `false` otherwise.
+- `invalidReason` — an enum specifying why the element is currently invalid, including
+  install-specific reasons like data errors from manifest fetching/parsing.
+- `initialPermissionStatus` and `permissionStatus` — inherited from the mixin. For `<install>`,
+  the permission is always bypassed (the element goes directly to the installation dialog),
+  so these reflect `"granted"` and are not meaningful for this element.
+- `onpromptaction` — fired when the user completes an installation prompt.
+- `onpromptdismiss` — fired when the user cancels or dismisses an installation prompt.
+- `onvalidationstatuschange` — fired when the validation status changes.
 
-* `invalidReason` will return an enum specifying the reason the element is considered invalid,
-  including invalidity of the element's underlying data (for cases in which the URL is missing 
-  or invalid, or manifest fetching/parsing fails).
+The element's [activation behavior][activation-behavior] is similar to other permission elements
+(e.g. [`<geolocation>`'s activation behavior][activate-geo]): the event must be trusted, the
+element must be valid, and then the installation flow is triggered. Unlike `<permission>` and
+`<geolocation>`, the `<install>` element always bypasses the permission prompt and goes directly
+to the installation confirmation dialog.
 
-* `initialPermissionStatus` and `permissionStatus` will reflect the state of the `install` feature
-  (which we'll define somewhere as a policy-controlled feature with a default allowlist of
-  `'self'`).
+The element hooks into the same backend as `navigator.install()`. When clicked, it loads the
+`installurl` in the background to obtain the web application manifest and related resources
+needed for the installation dialog. The fetching and processing steps follow those defined for
+[the "manifest" link type][manifest-fetch]. If a valid manifest is obtained, the installation
+dialog is presented. If not, the element reports the error via `invalidReason` and
+`onvalidationstatuschange`.
 
-* `promptaction` events will be fired when the user finishes interacting with any installation
-  prompt triggered by activating the element.
-
-* Likewise, `promptdismiss` will be fired when users cancel or dismiss the installation prompt.
-
-* `validationstatuschange` events fire when the validation status changes (crazy, right?).
-
-The element's [activation behavior][activation behavior] is quite similar to other permission
-elements (e.g. [`<geolocation>`'s activation behavior][activate-geo]): we'll check to see whether
-the event is trustworthy, the element is valid, permission to `install` is available and so on.
-Then we'll trigger an installation prompt in an implementation defined way. This will result in
-the user making some decision, leading to either a `promptdismiss` or `promptaction` event firing
-on the element.
-
-The element hooks directly into the backend of `navigator.install`. When clicked, it will 
-load the `installurl` in the background to obtain the web application manifest and related 
-resources needed for the installation dialog. The steps here will be similar to those defined 
-for [the "manifest" link type][manifest-fetch], fetching and processing the manifest according 
-to its [processing steps][manifest-process]. If we get a valid manifest back, the installation 
-dialog is presented. If not, an error event is fired and the `<install>` element reports the 
-error appropriately.
-
-[activation behavior]: https://dom.spec.whatwg.org/#eventtarget-activation-behavior
-[activate-geo]: https://wicg.github.io/PEPC/permission-elements.html#ref-for-dom-inpagepermissionmixin-features-slot%E2%91%A1%E2%93%AA
-[manifest-fetch]: https://html.spec.whatwg.org/multipage/links.html#link-type-manifest:linked-resource-fetch-setup-steps
-[manifest-process]: https://html.spec.whatwg.org/multipage/links.html#link-type-manifest:process-the-linked-resource
-
-Security & Privacy
-------------------
-
-### Cross origin considerations
-
-* Cross-origin installation requires us to talk about one origin in the context of another. This is somewhat difficult to do effectively. User agents should take care to provide a reasonably
-comprehensible, and informative installation flow to set user expectations correctly and protect
-from potential spoofing.
-
-* Sites which wish to ensure that users can only install their applications from their own origin
-  can do so by examining Fetch Metadata headers in the incoming request for a given manifest and
-  handle things appropriately in the case that `Sec-Fetch-Dest` is `manifest`, but `Sec-Fetch-Site`
-  is not `same-origin`.
-
-### Incognito/Private mode detection prevention
-
-Web apps are not installable from private modes. User agents need to ensure they don't
-accidentally expose information to indicate that's why the installation failed, e.g 
-failing immediately, which could hint that no manifest was fetched.
-
-### What if this is an app for a [Donaudampfschifffahrtsgesellschaftskapitän][german]?
-
-User agents will need to consider how to handle very long words, including appropriate resizing, eliding, and truncation logic (similar to what the installation dialog already implements). User agents should apply the same considerations they use [elsewhere][url-display] for displaying origins and names.
-
-[german]: https://en.wiktionary.org/wiki/Donaudampfschifffahrtsgesellschaftskapit%C3%A4n
-[url-display]: https://chromium.googlesource.com/chromium/src/+/HEAD/docs/security/url_display_guidelines/url_display_guidelines.md
-
-Open Questions
-------------
+## Open Questions
 
 ### Will this work with WebXR/WebGL scenarios?
 
-No, this is a known limitation of the element proposal.
+No, this is a known limitation of the element-based approach.
 
->The [HTML in Canvas](https://github.com/WICG/html-in-canvas) proposal makes this possible, however additional consideration is needed to avoid privacy/security leaks. See [How will this work with HTML in Canvas](https://github.com/WICG/install-element/issues/9)
+> The [HTML in Canvas](https://github.com/WICG/html-in-canvas) proposal could make this
+> possible, but additional consideration is needed to avoid privacy/security leaks.
+> See [#9](https://github.com/WICG/install-element/issues/9).
 
 ### Are iframes supported?
 
-Currently, this is restricted to top level browsing contexts for security purposes. Same origin iframes are unlikely to pose a risk and may be supported in the future.
+Currently restricted to top-level browsing contexts for security purposes. Same-origin iframes
+are unlikely to pose a risk and may be supported in the future.
 
 ### How does it behave in sandboxed contexts?
 
-Currently, this is disabled in all sandboxed contexts. If a use case for installing from a sandbox presents itself in the future, a strict allow-list can be implemented.
+Currently disabled in all sandboxed contexts as an interim measure. If a use case for installing
+from a sandbox presents itself, a strict allow-list can be implemented. This decision is open to
+reevaluation.
 
-Alternatives
-------------
-* [Web Install API][api] (navigator.install)
-* Given that the behavior discussed above would support both installation and launching, depending
-  on the application's installed state, some more generic name might be appropriate. `<pwa>` or
-  `<webapp>` could more broadly describe a potential range of behavior. `<install>` seems preferrable, as launching seems like it's really just a privacy-preserving mechanism to align behavior without
-  revealing installation state, but another broader name could certainly be viable.
+### What text should be in the button?
 
-[api]: https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/WebInstall/explainer.md
+The button's rendering is implementation-defined. User agents may combine an action verb with
+the application's origin, render the app's name if trusted, or use other approaches. It is
+worth discussing what considerations user agents should pay attention to, but specifying the
+content too precisely would be unhelpful.
 
-Future design considerations
---------------
+### Handling long names and origins
 
-### Install by manifesturl?
+User agents will need to consider how to handle very long words, including appropriate resizing,
+eliding, and truncation logic (similar to what the installation dialog already implements).
+User agents should apply the same considerations they use
+[elsewhere][url-display] for displaying origins and names.
 
-Should the `installurl` attribute be supplemented with, or even replaced by, a `manifesturl` attribute? e.g. https://youtube.com/manifest.webmanifest
+## Accessibility, Internationalization, Privacy, and Security Considerations
 
-Issue - [Specifying manifests vs documents](https://github.com/WICG/install-element/issues/5#issuecomment-3613279651)
+### Accessibility
 
-Installing from a manifest file directly avoids the overhead of loading the document at `installurl` in the background, and makes it possible to present app metadata in the button without a full page load. It also reduces complexity around manifest id requirements as the manifest file is the source of truth for an app's identity. However, it introduces a variety of additional concerns -
+The element renders as a button and inherits standard button accessibility semantics, including
+keyboard navigation and focus management. The default `tabindex` is 0. Screen readers should
+announce the element's text content (controlled by the user agent).
 
-* **Preventing manifest spoofing** - Manifests are not required to be served from the same origin as the site (e.g. CDN). To avoid spoofing, we'd need to load `start_url` in the background, and verify its manifest matches the provided attribute value. Alternatively, we could require that manifests be on the same origin.
-* **Service worker registration** - Presently, service workers are registered on page load, and the manifest file does not contain a static reference to the service worker. One possibility is requiring a `serviceworker` field in the manifest. Alternatively, if the user agent chooses to launch the app immediately after installation, that may be sufficient as the service worker would be registered on page load.
-* **Stale manifest urls** - Generally, manifest urls are more likely to change than install urls. For example, a URL like youtube.com is unlikely to change anytime soon, whereas the manifest file is more likely to be renamed or moved. To avoid stale manifest urls, developers would need to periodically fetch the HTML and parse it to ensure the manifest is still in the expected location.
-* **Manifest Parsing** - We can parse the manifest by setting the `documentUrl` as the origin of the `manifesturl`, but we'll likely need to change the manifest spec more.
+### Internationalization
 
-Realistically we need developers to tell us what they want/need here. (In fact, we've already received [feedback](https://github.com/WICG/install-element/issues/1) that supporting both is desirable.) In the meantime, our proposal remains to start out with `installurl` and `manifestid` to begin gathering feedback, and allow time to continue iterating on these considerations.
+The element observes the `lang` attribute to select localized text for the button label (e.g.
+"Install" in the page's language). App names from manifests may also be localized based on
+browser language.
+
+### Privacy
+
+- The element does not reveal whether an app is installed. The "Launch" state has been
+  removed due to a width side-channel discovered during security review. See
+  [#17](https://github.com/WICG/install-element/issues/17).
+- Web apps are not installable from private/incognito modes. User agents must ensure they
+  don't expose information indicating that's why installation failed (e.g. by not failing
+  immediately, which could hint that no manifest was fetched).
+- Cross-origin installation does not grant any permissions to the installing origin.
+  Each installed app has its own independent set of permissions.
+
+### Security
+
+- The element inherits [PEPC presentation restrictions][pepc-security]: visibility checks,
+  contrast ratio requirements, font size bounds, occlusion detection, and temporal cooldowns.
+  These prevent clickjacking and ensure the user can see and understand what they're clicking.
+- Cross-origin installation requires the user agent to present the target origin clearly.
+  Sites can restrict installation to same-origin by checking `Sec-Fetch-Dest: manifest` and
+  `Sec-Fetch-Site` headers.
+- The element is disabled in fenced frames and sandboxed contexts.
+- The element always bypasses the `web-app-installation` permission prompt — the PEPC
+  visibility and activation checks provide sufficient signal of user intent.
+
+## Alternatives Considered
+
+### Web Install API (`navigator.install()`)
+
+The [Web Install API][api] provides an imperative, promise-based approach to installation.
+It is currently available as an [Origin Trial](https://developer.chrome.com/docs/web-platform/origin-trials/)
+in Chrome and Edge. The `<install>` element and `navigator.install()` are complementary —
+they share the same backend implementation and can coexist. The declarative element provides
+stronger user-intent signals through the PEPC security model, while the imperative API offers
+more programmatic control.
+
+### `<a href="..." rel="install">`
+
+A declarative approach using the anchor element with a `rel="install"` attribute. This gives
+the user agent less control over the content and presentation but has the advantage of
+built-in progressive enhancement. The `<install>` element approach was chosen because it
+gives the user agent full control over the button's rendering, consistent with the PEPC model.
+
+### Alternative element names
+
+Names like `<pwa>` or `<webapp>` could more broadly describe the range of behavior (install
+and launch). `<install>` was preferred because launching is a privacy-preserving fallback
+rather than the primary purpose.
+
+## Future Design Considerations
+
+### Install by manifest URL?
+
+Should `installurl` be supplemented with a `manifesturl` attribute pointing directly to the
+manifest file? This could avoid the overhead of loading the document, but introduces concerns
+around manifest spoofing, service worker registration, and stale URLs. See
+[#5](https://github.com/WICG/install-element/issues/5) for discussion.
 
 ### Should manifest id be required?
 
-Issue - [Should we require manifestid](https://github.com/WICG/install-element/issues/6)
+Currently, if the developer does not provide a `manifestid` attribute, the manifest at
+`installurl` must have an `id` field. See
+[#6](https://github.com/WICG/install-element/issues/6).
 
-Under the current install by `installurl` proposal, the `manifestid` attribute is optional. However, if the developer does not provide this attribute, then `installurl` must point to a manifest file with an `id` field.
+### Custom information in the button
 
-Our guiding principle here is if the developer is not required to provide a manifest id, the user agent must always fetch the install url, then the manifest. This will likely fall out of the decisions around what url we use to install.
+Rendering the app name, origin, or icon in the element would provide a stronger signal of
+user intent but introduces performance, UX, security, and accessibility complications. See
+the [WICG discussion](https://github.com/WICG/install-element/issues) for details.
 
-### Custom Information in Button
+## Stakeholder Feedback / Opposition
 
-Rendering the app name, origin, or icon in the install element would provide an even stronger signal of user intent, but also introduces a variety of complications, such as:
-- **Performance:** When and how to get the information to show in the button
-- **UX:** Introduce a two-tap flow? (tap 1 loads information, tap 2 installs)
-- **Security:** Long app names. See [handling very long app names](#what-if-this-is-an-app-for-a-donaudampfschifffahrtsgesellschaftskapitän).
-- **Styling/Accessibility:** App icon contrast ratio. Button layout/width.
+- Chromium: Positive (implementing, in Origin Trial)
+- WebKit: No signals
+- Mozilla: No signals
 
-If user agents wish to include custom information, they should take these into consideration.
+## References & Acknowledgements
 
-It's also worth noting that the button's exact rendering may eventually be useful ambiguity, as it would allow each user agent to decide what information they need, and how to mitigate the concerns outlined above.
+This proposal builds on the [Permission Element (PEPC)][pepc] infrastructure and the
+[Web Install API][api].
+
+Many thanks for valuable feedback and advice from:
+
+- Daniel Appelquist
+- Amanda Baker
+- Marcos Cáceres
+- Diego Gonzalez
+- Lu Huang
+- Alex Russell
+- Arthur Sonzogni
+- Daniel Murphy
+- Howard Wolosky
+
+[api]: https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/WebInstall/explainer.md
+[pepc]: https://github.com/WICG/PEPC/
+[pepc-spec]: https://wicg.github.io/PEPC/permission-elements.html
+[pepc-security]: https://github.com/WICG/PEPC/blob/main/explainer.md#security-abuse
+[geolocation]: https://github.com/WICG/PEPC/blob/main/geolocation_explainer.md
+[mixin]: https://wicg.github.io/PEPC/permission-elements.html#permission-mixin
+[activation-behavior]: https://dom.spec.whatwg.org/#eventtarget-activation-behavior
+[activate-geo]: https://wicg.github.io/PEPC/permission-elements.html#ref-for-dom-inpagepermissionmixin-features-slot%E2%91%A1%E2%93%AA
+[manifest-fetch]: https://html.spec.whatwg.org/multipage/links.html#link-type-manifest:linked-resource-fetch-setup-steps
+[bg-steps]: https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/WebInstall/explainer-background-doc.md#background-document-1-param
+[cd-steps]: https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/WebInstall/explainer-current-doc.md#steps-to-install-the-app
+[url-display]: https://chromium.googlesource.com/chromium/src/+/HEAD/docs/security/url_display_guidelines/url_display_guidelines.md
