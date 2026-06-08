@@ -18,7 +18,7 @@ collaborative solutions fit for standardization.
 - This document status: **Active**
 - Expected venue: [W3C Web Incubator Community Group](https://github.com/WICG)
 - Current version: this document
-- Origin Trial: The `<install>` element is available as an [Origin Trial](https://developer.chrome.com/docs/web-platform/origin-trials/) in Chrome and Microsoft Edge.
+- Origin Trial: The `<install>` element is available as an [Origin Trial](https://developer.chrome.com/docs/web-platform/origin-trials/) in Chrome and Microsoft Edge through M152. This document describes the OT attribute shape (`installurl` / `manifestid`). A forward-looking design that aligns the element with the manifest-URL shape of [navigator.install()][api] is under construction in [manifest-url-explainer.md](./manifest-url-explainer.md).
 
 ## Table of Contents
 
@@ -32,6 +32,19 @@ whose text and iconography are determined by the browser, providing a strong sig
 and protection against spoofing. The element is part of the
 [Permission Element](https://wicg.github.io/PEPC/permission-elements.html) family, sharing the
 same security model, styling restrictions, and validation infrastructure.
+
+## Relationship to other proposals
+
+The `<install>` element is one of two entry points to web app installation initiated by a
+website. The other is the [Web Install API][api] (`navigator.install()`), which provides a
+promise-based JavaScript entry point. Both share a single backend implementation — manifest
+fetch, validation, consent UI, and error taxonomy.
+
+- **Backend behavior** (manifest fetch, validation, cross-origin / sandbox / activation gates,
+  error taxonomy) is specified normatively in the [Web Install API explainer][api]. This
+  document references those algorithms but does not re-specify them.
+- **Element-specific behavior** (PEPC mixin, validation events, fallback content, the
+  document-fetch step used during the OT) is specified here.
 
 ## User-Facing Problem
 
@@ -177,7 +190,7 @@ rejections with `DOMException` names, the `<install>` element uses the
 | Invalid URL / no manifest / id mismatch | `DataError` rejection | `invalidReason` updated, `onvalidationstatuschange` fired |
 | Invalid installurl attribute | `DataError` rejection | Element disabled, `invalidReason` set |
 | User cancels / dismisses prompt | `AbortError` rejection | `onpromptdismiss` fired |
-| Installation succeeds | Promise resolves with `{ id }` | `onpromptaction` fired |
+| Installation succeeds | Promise resolves (no result fields) | `onpromptaction` fired |
 | No user activation | `NotAllowedError` rejection | Click ignored (element not valid) |
 | Called outside main frame | `InvalidStateError` rejection | Element not supported in iframes/sandboxes |
 
@@ -386,7 +399,7 @@ the [WICG discussion](https://github.com/WICG/install-element/issues) for detail
 ## Stakeholder Feedback / Opposition
 
 - Chromium: Positive (implementing, in Origin Trial)
-- WebKit: No signals
+- WebKit: Opposed
 - Mozilla: No signals
 
 ## References & Acknowledgements
@@ -415,6 +428,6 @@ Many thanks for valuable feedback and advice from:
 [activation-behavior]: https://dom.spec.whatwg.org/#eventtarget-activation-behavior
 [activate-geo]: https://wicg.github.io/PEPC/permission-elements.html#ref-for-dom-inpagepermissionmixin-features-slot%E2%91%A1%E2%93%AA
 [manifest-fetch]: https://html.spec.whatwg.org/multipage/links.html#link-type-manifest:linked-resource-fetch-setup-steps
-[bg-steps]: https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/WebInstall/explainer-background-doc.md#background-document-1-param
-[cd-steps]: https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/WebInstall/explainer-current-doc.md#steps-to-install-the-app
+[bg-steps]: https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/WebInstall/install-url-version/explainer-background-doc.md#background-document-1-param
+[cd-steps]: https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/WebInstall/install-url-version/explainer-current-doc.md#steps-to-install-the-app
 [url-display]: https://chromium.googlesource.com/chromium/src/+/HEAD/docs/security/url_display_guidelines/url_display_guidelines.md
