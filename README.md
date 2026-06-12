@@ -27,7 +27,7 @@ fetch, validation, consent UI, and error taxonomy.
 There are currently two explainers for the `<install>` element, reflecting two different attribute
 designs for how the element identifies the app to install.
 
-### Install-URL design (`installurl` / `manifestid`) — Origin Trial
+### Install-URL design (`installurl` / `manifestid`) -- Origin Trial
 
 **[explainer-install-url.md](./explainer-install-url.md)**
 
@@ -40,7 +40,7 @@ designs for how the element identifies the app to install.
   explainer as their reference.
 - This design will reach end of life at its Origin Trial conclusion.
 
-### Manifest-URL design (`manifest` / `id`) — Incubating
+### Manifest-URL design (`manifest` / `id`) -- Incubating
 
 **[explainer-manifest-url.md](./explainer-manifest-url.md)**
 
@@ -51,14 +51,6 @@ designs for how the element identifies the app to install.
 - This design eliminates the document-fetch step, reducing latency and removing the
   cross-origin HTML parse surface. It is expected to replace the install-URL design at the
   close of the Origin Trial.
-
-### Which explainer should I read?
-
-| I want to… | Read |
-|---|---|
-| Use the `<install>` element in the current Origin Trial | [explainer-install-url.md](./explainer-install-url.md) |
-| Understand the future direction of the element | [explainer-manifest-url.md](./explainer-manifest-url.md) |
-| Provide feedback on the element's design | Both, plus the [issue tracker](https://github.com/WICG/install-element/issues) |
 
 ## Stakeholder Feedback / Opposition
 
