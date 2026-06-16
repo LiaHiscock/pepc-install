@@ -57,8 +57,10 @@ infrastructure.
 
 ## User-Facing Problem
 
-End users don't have a standard, cross-platform way to acquire web applications.
-The process of distributing and installing web apps is both fragmented and limited:
+Think about all the websites you use regularly - email, online shopping, social
+media, streaming sites, etc. For most users, this requires launching a browser
+and clicking or typing to get to those sites every time. Web applications enable developers to provide native, "app-like" experiences to end users while building
+on the trust set by their browser. However, for end users there's no standard, cross-platform way to acquire web applications. The process of distributing and installing web apps is both fragmented and limited:
 
 - Each browser has different, often hidden, entry points for installation
   (address bar icons, menu items, prompts).
@@ -66,8 +68,8 @@ The process of distributing and installing web apps is both fragmented and limit
   that "installation" is even possible on the web.
 - Developers have no standard declarative mechanism to present an install action
   to users.
-- Cross-origin installation (e.g. an app catalog installing apps from other sites)
-  has no built-in web platform support.
+- Cross-origin installation (e.g. an app catalog installing apps from other
+  sites) has no built-in web platform support.
 
 ### Goals
 
