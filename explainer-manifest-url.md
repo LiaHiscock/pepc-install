@@ -59,8 +59,11 @@ infrastructure.
 
 Think about all the websites you use regularly - email, online shopping, social
 media, streaming sites, etc. For most users, this requires launching a browser
-and clicking or typing to get to those sites every time. Web applications enable developers to provide native, "app-like" experiences to end users while building
-on the trust set by their browser. However, for end users there's no standard, cross-platform way to acquire web applications. The process of distributing and installing web apps is both fragmented and limited:
+and clicking or typing to get to those sites every time. Web applications enable
+developers to provide native, "app-like" experiences to end users while building
+on the trust set by their browser. However, for end users there's no standard,
+cross-platform way to acquire web applications. The process of distributing and
+installing web apps is both fragmented and limited:
 
 - Each browser has different, often hidden, entry points for installation
   (address bar icons, menu items, prompts).
