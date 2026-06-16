@@ -251,13 +251,17 @@ may be more stable than manifest URLs), but it introduces a variety of security,
 privacy, and performance concerns. See [explainer-install-url.md](./explainer-install-url.md)
 for the full design.
 
-### Anchor-based (`<a rel="install" href="manifest URL">`)
+### Declarative `<a>`-based
 
-A declarative approach using the anchor element with a `rel="install"`
-attribute. This gives the user agent less control over the content and
-presentation but has the advantage of built-in progressive enhancement. The
-`<install>` element approach was chosen because it gives the user agent full
-control over the button's rendering, consistent with the PEPC model.
+`<a href="manifest_url" rel="install">`
+
+The Web Install API proposal considered a different declarative approach.
+This gives the user agent less control over the content and presentation but has
+the advantage of built-in progressive enhancement. The `<install>` element approach
+was chosen because it gives the user agent full control over the button's rendering,
+consistent with the PEPC model.
+
+See the [API][api] proposal for detailed analysis.
 
 ### Alternative element names
 
@@ -352,11 +356,11 @@ be localized based on browser language.
   positive privacy shift -- fewer cross-origin resources are loaded before user
   consent.
 - The element does not reveal whether an app is installed. The "Launch" state
-  has been removed due to a width side-channel discovered during security review.
-  See [#17](https://github.com/WICG/install-element/issues/17).
+  has been removed pending mitigation of a width side-channel discovered during
+  security review. See [#17](https://github.com/WICG/install-element/issues/17).
 - Web apps are not installable from private/incognito modes. User agents must
   ensure they don't expose information indicating that's why installation failed
-  (e.g. by not failing immediately, which could hint that no manifest was fetched).
+  (e.g. failing immediately, which could hint that no manifest was fetched).
 - Cross-origin installation does not grant any permissions to the installing
   origin. Each installed app has its own independent set of permissions.
 
