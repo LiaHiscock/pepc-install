@@ -45,6 +45,14 @@ same security model, styling restrictions, and validation infrastructure.
 - **This document** -- defines install-specific properties/behaviors on top of the
   CapabilityElementBase and WebInstall backend.
 
+| If you're asking… | See |
+|---|---|
+| How do I add an install button to my page? | This doc |
+| Why won't the element activate? | [Permission Element spec][pepc-spec] |
+| What styling am I allowed to apply? | [Permission Element spec][pepc-spec] |
+| Why did the manifest fail to fetch or parse? | [Web Install API][api] |
+| What events fire after activation? | This doc |
+
 ## User-Facing Problem
 
 End users don't have a standard, cross-platform way to acquire web applications. The process of
@@ -339,9 +347,11 @@ browser language.
 
 ## Stakeholder Feedback / Opposition
 
-- Chromium: Positive (implementing, in Origin Trial)
-- WebKit: Opposed
-- Mozilla: No signals
+- W3C TAG Review: PENDING
+- Browser Standards Positions:
+  - Chromium: [Supportive/Implementing](https://chromestatus.com/feature/5183481574850560)
+  - Mozilla: [mozilla/standards-positions#1179](https://github.com/mozilla/standards-positions/issues/1179)
+  - WebKit: [WebKit/standards-positions#463](https://github.com/WebKit/standards-positions/issues/463)
 
 ## References & Acknowledgements
 

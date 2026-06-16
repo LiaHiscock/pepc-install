@@ -24,39 +24,39 @@ fetch, validation, consent UI, and error taxonomy.
 
 ## Explainers
 
-There are currently two explainers for the `<install>` element, reflecting two different attribute
-designs for how the element identifies the app to install.
+There are currently two explainers for the `<install>` element that reflect two
+different methods of specifying which web app to install. One accepts an
+`installurl`, and the other accepts a `manifest` URL.
 
-### Install-URL design (`installurl` / `manifestid`) -- Origin Trial
+### Install-URL design (`installurl` / `manifestid`)
 
 **[explainer-install-url.md](./explainer-install-url.md)**
 
-- **Status:** Active Origin Trial in Chrome and Microsoft Edge through M152.
+> Here for Origin Trials? Use this explainer.
+
 - **Attributes:** `installurl` (a page URL) and `manifestid` (the app's computed manifest id).
 - **How it works:** On activation, the element loads the page at `installurl` in the background,
   discovers its `<link rel="manifest">`, fetches and validates the manifest, then presents the
   installation dialog.
-- This is the currently-shipping design. Developers in the Origin Trial should use this
-  explainer as their reference.
 - This design will reach end of life at its Origin Trial conclusion.
 
-### Manifest-URL design (`manifest` / `id`) -- Incubating
+### Manifest-URL design (`manifest` / `id`)
 
 **[explainer-manifest-url.md](./explainer-manifest-url.md)**
 
-- **Status:** Incubating. Not yet shipping in any Origin Trial.
-- **Planned Attributes:** `manifest` (a manifest URL) and `id` (the app's computed manifest id).
+- **Attributes:** `manifest` (a manifest URL) and `id` (the app's computed manifest id).
 - **How it works:** On activation, the element fetches the manifest directly from the supplied
   URL, skipping the intermediate page load.
 - This design eliminates the document-fetch step, reducing latency and removing the
-  cross-origin HTML parse surface. It is expected to replace the install-URL design at the
-  close of the Origin Trial.
+  cross-origin HTML parse surface. It is expected to replace the install-URL design.
 
 ## Stakeholder Feedback / Opposition
 
-- Chromium: Positive (implementing, in Origin Trial)
-- WebKit: Opposed
-- Mozilla: No signals
+- W3C TAG Review: PENDING
+- Browser Standards Positions:
+  - Chromium: [Supportive/Implementing](https://chromestatus.com/feature/5183481574850560)
+  - Mozilla: [mozilla/standards-positions#1179](https://github.com/mozilla/standards-positions/issues/1179)
+  - WebKit: [WebKit/standards-positions#463](https://github.com/WebKit/standards-positions/issues/463)
 
 ## References & Acknowledgements
 
