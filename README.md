@@ -1,16 +1,17 @@
 # The `<install>` Element
 
-The `<install>` element is a declarative HTML element that allows web developers to offer
-installation of web applications directly from a page. It renders a user-agent-controlled button
-whose text and iconography are determined by the browser, providing a strong signal of user intent
-and protection against spoofing. The element is part of the
-[Permission Element](https://wicg.github.io/PEPC/permission-elements.html) family, sharing the
-same security model, styling restrictions, and validation infrastructure.
+The `<install>` element is a declarative HTML element that allows web developers
+to offer installation of web applications directly from a page. It renders a
+user-agent-controlled button whose text and iconography are determined by the
+browser, providing a strong signal of user intent and protection against spoofing.
+The element is part of the [Permission Element](https://wicg.github.io/PEPC/permission-elements.html)
+family, sharing the same security model, styling restrictions, and validation
+infrastructure.
 
-The `<install>` element is one of two entry points to web app installation initiated by a
-website. The other is the [Web Install API][api] (`navigator.install()`), which provides a
-promise-based JavaScript entry point. Both share a single backend implementation — manifest
-fetch, validation, consent UI, and error taxonomy.
+The `<install>` element is one of two entry points to web app installation
+initiated by a website. The other is the [Web Install API][api] - `navigator.install()` -
+which provides a promise-based JavaScript entry point. Both share a single backend
+implementation — manifest fetch, validation, consent UI, and error taxonomy.
 
 ## Authors
 
@@ -35,9 +36,9 @@ different methods of specifying which web app to install. One accepts an
 > Here for Origin Trials? Use this explainer.
 
 - **Attributes:** `installurl` (a page URL) and `manifestid` (the app's computed manifest id).
-- **How it works:** On activation, the element loads the page at `installurl` in the background,
-  discovers its `<link rel="manifest">`, fetches and validates the manifest, then presents the
-  installation dialog.
+- **How it works:** On activation, the element loads the page at `installurl` in
+  the background, discovers its `<link rel="manifest">`, fetches and validates
+  the manifest, then presents the installation dialog.
 - This design will reach end of life at its Origin Trial conclusion.
 
 ### Manifest-URL design (`manifest` / `id`)
@@ -45,8 +46,8 @@ different methods of specifying which web app to install. One accepts an
 **[explainer-manifest-url.md](./explainer-manifest-url.md)**
 
 - **Attributes:** `manifest` (a manifest URL) and `id` (the app's computed manifest id).
-- **How it works:** On activation, the element fetches the manifest directly from the supplied
-  URL, skipping the intermediate page load.
+- **How it works:** On activation, the element fetches the manifest directly
+  from the supplied URL, skipping the intermediate page load.
 - This design eliminates the document-fetch step, reducing latency and removing the
   cross-origin HTML parse surface. It is expected to replace the install-URL design.
 
@@ -60,8 +61,8 @@ different methods of specifying which web app to install. One accepts an
 
 ## References & Acknowledgements
 
-This proposal builds on the [Permission Element (PEPC)][pepc] infrastructure and the
-[Web Install API][api].
+This proposal builds on the [Permission Element (PEPC)][pepc] infrastructure and
+the [Web Install API][api].
 
 Many thanks for valuable feedback and advice from:
 
