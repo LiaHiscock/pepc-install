@@ -51,7 +51,7 @@ different methods of specifying which web app to install. One accepts an
 - This design eliminates the document-fetch step, reducing latency and removing the
   cross-origin HTML parse surface. It is expected to replace the install-URL design.
 
-## Stakeholder Feedback / Opposition
+## Stakeholder Feedback
 
 - W3C TAG Review: PENDING
 - Browser Standards Positions:
