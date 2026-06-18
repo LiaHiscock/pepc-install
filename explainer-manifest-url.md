@@ -424,7 +424,7 @@ For full details reference the [API][api] security section.
 - The element cannot be activated in cross-origin subframes, fenced frames, and
   all sandboxed contexts.
 
-## Stakeholder Feedback / Opposition
+## Stakeholder Feedback
 
 - W3C TAG Review: PENDING
 - Browser Standards Positions:
