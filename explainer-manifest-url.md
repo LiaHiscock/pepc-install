@@ -138,9 +138,10 @@ Shared with navigator.install:
 
 ### Install me! (Same origin install button)
 
-A site can ergonomically trigger the user agent's installation flow, eliminating
-the need to subscribe to events, or try and direct users through potentially
-several layers of browser UX to discover the installation entry point on their own.
+A web developer can ergonomically trigger the user agent's installation flow,
+eliminating the need to subscribe to events, or try and direct users through
+potentially several layers of browser UX to discover the installation entry
+point on their own.
 
 This is the simplest case -- no attributes are needed:
 
@@ -155,7 +156,6 @@ the manifest URL of each listed app:
 
 ```html
 <install manifest="https://music.youtube.com/manifest.webmanifest"
-         id="https://music.youtube.com/?source=pwa">
 </install>
 ```
 
@@ -171,10 +171,11 @@ A productivity suite can install related apps from the same origin:
 
 ## Proposed Approach
 
-> As noted above in related proposals, this approach assumes familiarity with
-> the [permission element spec][pepc-spec], which outlines in detail the
-> element's behavior, including styling and activation restrictions,
-> error handling, etc.
+> ### DISCLAIMER!
+> As noted in the [related proposals section](#relationship-to-other-proposals),
+> this approach assumes familiarity with the [permission element spec][pepc-spec],
+> which outlines in detail the element's behavior, including **styling and
+> activation restrictions**, error handling, etc.
 
 A declarative `<install>` element that renders a button whose content
 and presentation is controlled by the user agent. Similar to other
@@ -189,15 +190,17 @@ installation flow begins.
 The element renders standardized text and iconography controlled by
 the user agent:
 
-<img alt='A button whose text reads "Install", with an icon signifying the action of installation.' src='./install-icon.png'>
+<img alt='A button whose text reads "Install", with an icon signifying the action of installation.'
+     src='./install-icon.png'
+     width='300'>
 
 ### Element attributes
 
 - `manifest` -- URL of the web app manifest to install.
-- `id` -- The manifest id of the app to install. Must be an absolute URL.
+- `applicationId` -- The manifest id of the app to install.
 
-Both attributes are optional. The developer may omit the `id` parameter, if and
-only if the JSON at `manifest` contains an `id`.
+Both attributes are optional. The developer may omit `applicationId`, if and
+only if the JSON at `manifest` contains an `id` field.
 
 As an added convenience, the developer may omit `manifest`, in which case the
 currently loaded page's manifest is targeted for install.
@@ -213,7 +216,7 @@ currently loaded page's manifest is targeted for install.
 
 <!-- Install a specific app whose manifest does not declare an `id` -->
 <install manifest="https://app.example.com/manifest.webmanifest"
-         id="https://app.example.com/?source=catalog"></install>
+         applicationId="https://app.example.com/?source=catalog"></install>
 ```
 
 ### Element fallback content
@@ -224,7 +227,7 @@ If the user agent doesn't support installation, fallback content can be rendered
 
 ```html
 <install manifest="https://music.youtube.com/manifest.webmanifest"
-         id="https://music.youtube.com/?source=pwa">
+         applicationId="https://music.youtube.com/?source=pwa">
   <a href="https://music.youtube.com/" target="_blank">
     Launch YouTube Music
   </a>
@@ -234,8 +237,8 @@ If the user agent doesn't support installation, fallback content can be rendered
 ### Activation behavior
 
 On activation, the element invokes the install algorithm defined in
-[Web Install API][api] with the optionally supplied `manifest` and `id`. The
-backend's algorithms for manifest fetch, validation, consent UI, and error
+[Web Install API][api] with the optionally supplied `manifest` and `applicationId`.
+The backend's algorithms for manifest fetch, validation, consent UI, and error
 mapping apply unchanged.
 
 Example consent UI for users to review security-sensitive fields such as the app
@@ -247,6 +250,25 @@ Where `navigator.install()` uses promise rejections with `DOMException` names,
 the `<install>` element surfaces outcomes through two mechanisms: pre-click
 validation via the [InPagePermissionMixin][mixin], and post-click results via
 `InstallResultEvent` (see [Error handling](#error-handling--debuggability) below).
+
+### What if the app is already installed?
+
+The UA can choose to render the element as a "Launch" button and activation would
+follow established [launch handler](https://developer.mozilla.org/en-US/docs/Web/API/Launch_Handler_API) 
+algorithms. **UAs must ensure installation status is not exposed to side-channel attacks.**
+See [Privacy](#privacy) for more details.
+
+<img alt='A button showing Launch option when app is already installed.'
+     src='./launch-simple.png'
+     width='300'>
+
+### What if the element is rendered *in* the installed app context?
+
+As a convenience, the UA could hide the element in installed windows. There is
+also an active proposal for a [media feature](https://docs.google.com/document/d/1qKf-M09Sc37OkDWyeWpXN0lQwNGVHCvmX6SmyXk1gkU/edit?tab=t.0#heading=h.7nki9mck5t64)
+that answers the question *"am I in an installed app window?"* that allows
+developers to easily customize the look and feel of their installed app experience.
+
 
 ## Error handling / debuggability
 
@@ -268,11 +290,11 @@ Developer Tools > Issues tab.
 ### Post-activation: `InstallResultEvent`
 
 Errors and outcomes that occur *after* the user clicks (manifest fetch failures,
-parse errors, manifest `id` mismatches, user cancellation, success) are surfaced
-via a dedicated `InstallResultEvent`. The result is a property on the event
-object -- not on the element -- because the install flow is asynchronous and a
-result tied to the element could be overwritten by a subsequent attempt before
-the handler runs.
+parse errors, `applicationId` doesn't match the UA-computed id, user cancellation,
+success) are surfaced via a dedicated `InstallResultEvent`. The result is a
+property on the event object -- not on the element -- because the install flow
+is asynchronous and a result tied to the element could be overwritten by a
+subsequent attempt before the handler runs.
 
 ```js
 element.addEventListener('installresult', (event) => {
@@ -317,16 +339,7 @@ privacy-preserving fallback rather than the primary purpose.
 
 ## Open Questions
 
-See [Web Install API's Open Questions](https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/WebInstall/explainer.md#open-questions) for shared open questions. Below are element-specific.
-
-### What if the app is already installed?
-
-The UA could render the element as a "Launch" button and activation would
-follow established [launch handler](https://developer.mozilla.org/en-US/docs/Web/API/Launch_Handler_API) 
-algorithms. **UAs must ensure installation status is not exposed to side-channel attacks.**
-See [Privacy](#privacy) for more details.
-
-<img alt='A button showing Launch option when app is already installed.' src='./launch-simple.png' width='400'>
+> **See [Web Install API's Open Questions](https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/WebInstall/explainer.md#open-questions) for shared open questions. Below are element-specific.**
 
 ### Can the element pre-fetch the manifest to render app metadata?
 
@@ -399,9 +412,13 @@ be localized based on browser language.
 
 ### Privacy
 
-A large portion of the privacy concerns are shared with navigator.install. Those
-can be found in the [API's][api] privacy section. Anything related to the element,
-but not `<install>`-specific can be found in [PEPC privacy](pepc-privacy).
+A large portion of the privacy concerns are shared with navigator.install, and
+can be found in the [API's][api] privacy section.
+
+Anything related to the element, but not `<install>`-specific can be found in
+[PEPC privacy](pepc-privacy).
+
+`<install>`-specific concerns -
 
 - **The element's rendering must not reveal whether an app is installed.** If
   UAs chose to render the "Launch" state, they must consider/mitigate the
@@ -439,15 +456,13 @@ the [Web Install API][api].
 
 Many thanks for valuable feedback and advice from:
 
-- Daniel Appelquist
-- Amanda Baker
 - Marcos Cáceres
 - Diego Gonzalez
 - Lu Huang
 - Alex Russell
 - Arthur Sonzogni
 - Daniel Murphy
-- Howard Wolosky
+- Mike West
 
 [api]: https://github.com/MicrosoftEdge/MSEdgeExplainers/blob/main/WebInstall/explainer.md
 [pepc]: https://github.com/WICG/PEPC/
